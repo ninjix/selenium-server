@@ -65,6 +65,14 @@ service seleniumd start
 service xvfbd start
 ```
 
+## Setup Log Rotation
+
+Copy the logrotate configuration files to the /etc/logroate.d directory.
+
+```bash
+cp centos/logrotate.d/* /etc/logrotate.d/
+```
+
 ## Testing (Optional)
 
 Here is a quick way to test if the system is working correctly using Python.
