@@ -1,0 +1,12 @@
+/var/log/selenium/*.log {
+        daily
+        missingok
+        rotate 20
+        compress
+        delaycompress
+        notifempty
+        sharedscripts
+        postrotate
+            /sbin/service seleniumd restart > /dev/null
+        endscript
+}

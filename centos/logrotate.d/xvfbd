@@ -1,0 +1,12 @@
+/var/log/xvfb/*.log {
+        daily
+        missingok
+        rotate 20
+        compress
+        delaycompress
+        notifempty
+        sharedscripts
+        postrotate
+            /sbin/service xvfbd restart > /dev/null
+        endscript
+}
