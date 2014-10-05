@@ -21,9 +21,9 @@
 
 
 SERVICE=Selenium
-USER=beryllium
+USER=selenium
 JAVA_BIN=/usr/bin/java
-SELENIUM_HOME=/usr/lib/selenium
+SELENIUM_HOME=/opt/selenium
 SELENIUM_VERSION=2.43.1
 SELENIUM_CMD="$SELENIUM_HOME/selenium-server-standalone-$SELENIUM_VERSION.jar"
 LOCK_FILE=/var/lock/subsys/Selenium

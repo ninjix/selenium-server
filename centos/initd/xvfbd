@@ -21,7 +21,7 @@
 
 
 SERVICE=Xvfb
-USER=beryllium
+USER=selenium
 XVFB_BIN=/usr/bin/Xvfb
 XVFB_OPTS=":99.0 -ac -screen 0 1280x1024x24 -nolisten tcp"
 LOCK_FILE=/var/lock/subsys/Xfvb
