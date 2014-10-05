@@ -1,0 +1,160 @@
+#!/bin/bash
+# /etc/rc.d/init.d/seleniumd
+#
+# seleniumd		Start and stops Selenium daemon
+#
+# chkconfig: 345 08 92
+# description:  Starts, stops and restarts Selenium session
+#
+### BEGIN INIT INFO
+# Provides: selenium 
+# Required-Start: $remote_fs $syslog $network
+# Required-Stop: $remote_fs $syslog $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop Selenium session
+# Description: Start, stop and restart Selenium session
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+
+SERVICE=Selenium
+USER=beryllium
+JAVA_BIN=/usr/bin/java
+SELENIUM_HOME=/usr/lib/selenium
+SELENIUM_VERSION=2.43.1
+SELENIUM_CMD="$SELENIUM_HOME/selenium-server-standalone-$SELENIUM_VERSION.jar"
+LOCK_FILE=/var/lock/subsys/Selenium
+LOG_FILE=/var/log/selenium/selenium.log
+DISPLAY=:99.0
+
+pid_of_selenium(){
+    pgrep -f "java.*selenium"
+}
+
+ensure_dir () {
+    FILE_DIR=$(dirname "$1")
+    if [ ! -d ${FILE_DIR} ] ; then
+        mkdir -p ${FILE_DIR}
+        chown -R ${USER}:${USER} ${PID_DIR}
+        chmod 755 ${FILE_DIR}
+    fi
+}
+
+start() {
+	local retval=
+	
+	ensure_dir "${LOG_FILE}"
+
+	echo -n "Starting ${SERVICE} for Selenium: "
+	su -l "${USER}" -s /bin/bash -c "DISPLAY=${DISPLAY} ${JAVA_BIN} -jar ${SELENIUM_CMD} >> ${LOG_FILE} 2>&1 &"
+	
+	retval=$?
+	
+	[ "$retval" -eq 0 ] && touch "${LOCK_FILE}" && success || failure
+	echo 
+	
+	return ${retval}
+}	
+
+stop() {
+	local retval=
+
+	pid=$(pid_of_selenium)
+	[ -n "${pid}" ] && kill "${pid}"
+	
+	retval=$?
+	
+	echo -n "Shutting down ${SERVICE} for Selenium: "
+	[ "$retval" -eq 0 ] && success || failure
+	    
+	echo
+	
+	rm -f "${LOCK_FILE}"
+	return ${retval}
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	status)
+		status "${SERVICE}"
+		;;
+	restart)
+		stop
+		start
+		;;
+	reload)
+		restart
+		;;
+	*)
+		echo "Usage : ${SERVICE} {start|stop|status|restart}"
+		exit 1
+		;;
+esac
+exit $?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+case "$1" in
+	start)
+		echo -n "Starting Selenium Hub ..."
+		# ensure that we have a dir for the logs
+		if [ ! -f $SELENIUM_LOG_FILE ]; then 
+			mkdir $(dirname $SELENIUM_LOG_FILE) > /dev/null 2>$1
+			chown $SELENIUM_USER:$SELENIUM_USER $(dirname $SELENIUM_LOG_FILE) > /dev/null 2>$1
+		fi
+		# retrieving pid of the paretn process
+		/bin/su -l "$SELENIUM_USER" --shel=/bin/bash -c "$JAVA_CMD $SELENIUM_GRID_CMD $PARAMS 2> $SELENIUM_LOG_FILE &"
+		echo $(ps hww -u "$SELENIUM_USER" -o pid,cmd | grep "$SELENIUM_GRID_CMD $PARAMS" | /bin/awk '{ print $1 }') > "$SELENIUM_PID"
+		if [ $? == "0" ]; then
+			success	
+		else
+			failure
+		fi
+		echo 
+		echo "Log file: $SELENIUM_LOG_FILE" 
+		;;
+	status)
+		status -p "$SELENIUM_PID" selenium 
+		;;
+	stop)
+		echo -n "Killing Selenium Grid ..."
+		killproc -p "$SELENIUM_PID" selenium
+		echo
+		;;
+	restart)
+		$0 stop
+		$0 start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|status|restart}"
+		exit 1
+esac

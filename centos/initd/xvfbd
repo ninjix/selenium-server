@@ -1,0 +1,88 @@
+#!/bin/bash
+# /etc/rc.d/init.d/xvfbd
+#
+# xvfbd		Start and stops Xvfb daemon session
+#
+# chkconfig: 345 08 92
+# description:  Starts, stops and restarts xvfb session
+#
+### BEGIN INIT INFO
+# Provides: xvfb
+# Required-Start: $remote_fs $syslog $network
+# Required-Stop: $remote_fs $syslog $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop xvfb session
+# Description: Start, stop and restart xvfb session
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+
+SERVICE=Xvfb
+USER=beryllium
+XVFB_BIN=/usr/bin/Xvfb
+XVFB_OPTS=":99.0 -ac -screen 0 1280x1024x24 -nolisten tcp"
+LOCK_FILE=/var/lock/subsys/Xfvb
+LOG_FILE=/var/log/xvfbd/xvfbd.log
+
+ensure_dir () {
+    FILE_DIR=$(dirname "$1")
+    if [ ! -d ${FILE_DIR} ] ; then
+        mkdir -p ${FILE_DIR}
+        chown -R ${USER}:${USER} ${PID_DIR}
+        chmod 755 ${FILE_DIR}
+    fi
+}
+
+start() {
+	local retval=
+	
+	ensure_dir "${LOG_FILE}"
+
+	echo -n "Starting ${SERVICE} for Selenium: "
+	daemon --user "${USER}" "${XVFB_BIN} ${XVFB_OPTS} >> ${LOG_FILE} 2>&1 &"
+	retval=$?
+	echo
+	[ "$retval" -eq 0 ] && touch "${LOCK_FILE}"
+	return ${retval}
+}	
+
+stop() {
+	local retval=
+
+	echo -n "Shutting down ${SERVICE} for Selenium: "
+	killproc "${SERVICE}"
+	echo
+	retval=$?
+	rm -f "${LOCK_FILE}"
+	return ${retval}
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	status)
+		status "${SERVICE}"
+		;;
+	restart)
+		stop
+		start
+		;;
+	reload)
+		restart
+		;;
+	condrestart)
+		[ -f "${LOCK_FILE}" ] && restart || start
+		;;
+		*)
+		echo "Usage : ${SERVICE} {start|stop|status|restart|reload|condrestart}"
+		exit 1
+		;;
+esac
+exit $?
