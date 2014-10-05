@@ -1,4 +1,4 @@
-/var/log/selenium/*.log {
+/var/log/selenium/selenium.log {
         daily
         missingok
         rotate 20

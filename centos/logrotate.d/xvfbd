@@ -1,4 +1,4 @@
-/var/log/xvfb/*.log {
+/var/log/xvfbd/xvfbd.log {
         daily
         missingok
         rotate 20
